@@ -1,4 +1,4 @@
-package com.example.expensetracker.common.constants;
+package com.example.expensetracker.util.constants;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

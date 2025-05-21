@@ -1,8 +1,7 @@
 package com.example.expensetracker.controllers;
 
-import com.example.expensetracker.common.constants.ErrorCodes;
-import com.example.expensetracker.common.response.ApiResponse;
-import com.example.expensetracker.common.response.ResponseUtil;
+import com.example.expensetracker.util.response.ApiBaseResponse;
+import com.example.expensetracker.util.response.ResponseUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,11 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.expensetracker.util.enums.ErrorCodes.getMessageByCode;
+
 @RestController
 @RequestMapping("/api/preloadData/getExpense")
 public class PreloadDataController {
     @GetMapping
-    public ApiResponse getExpense() {
+    public ApiBaseResponse<List<Map<String, Object>>> getExpense() {
         try {
 
 
@@ -52,8 +53,8 @@ public class PreloadDataController {
 
             return ResponseUtil.successResp("ok", expenseList);
         } catch (Exception e) {
-            ErrorCodes data = ErrorCodes.BACKEND_ERROR;
-            return ResponseUtil.errorResp(data.getErrorCode(), data.getErrorMessage());
+
+            return ResponseUtil.errorResp(500, getMessageByCode(500));
         }
     }
 
