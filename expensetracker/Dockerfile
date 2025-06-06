@@ -8,7 +8,7 @@ FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
 # Copy the JAR file into the container
-COPY ..
+COPY . .
 #target/*.jar app.jar
 
 # Expose port 8080
@@ -18,4 +18,4 @@ RUN ./mvnw package
 # ENTRYPOINT ["java", "-jar", "app.jar"]
 
 
-CMD["java", "-jar", "target/<expensetracker-0.0.1-SNAPSHOT"]
+CMD["java", "-jar", "target/<expensetracker-0.0.1-SNAPSHOT.jar"]
