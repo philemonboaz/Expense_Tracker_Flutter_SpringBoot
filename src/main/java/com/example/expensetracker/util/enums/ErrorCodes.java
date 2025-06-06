@@ -35,7 +35,7 @@ public enum ErrorCodes {
         ErrorCodes ec = CODE_MAP.get(code);
         return ec != null ? ec.getErrorMessage() : "Unknown error";
     }
-    
+
     public int getErrorCode() {
         return errorCode;
     }
