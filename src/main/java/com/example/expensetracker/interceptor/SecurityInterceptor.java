@@ -3,13 +3,17 @@ package com.example.expensetracker.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Base64;
 
-@Component
-
+@Configuration
+@EnableWebSecurity
 public class SecurityInterceptor implements HandlerInterceptor {
 
     @Value("${auth.basic.username}")
@@ -18,9 +22,23 @@ public class SecurityInterceptor implements HandlerInterceptor {
     @Value("${auth.basic.password}")
     private String BASIC_AUTH_PASSWORD;
 
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll() // or restrict as needed
+                );
+
+        return http.build();
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+
+        System.out.println("[AUTH] Incoming request to: " + request.getRequestURI());
+        System.out.println("[AUTH] Authorization header: " + handler);
 
         String requestURI = request.getRequestURI();
         // Custom logic: header check, token validation, logging, etc.
