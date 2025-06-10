@@ -17,7 +17,7 @@ public interface InitDataRepository extends JpaRepository<InitDataEntity, Long> 
     void insertInitData(@Param("deviceId") String deviceId, @Param("uniqueId") String uniqueId, @Param("jwtToken") String jwtToken);
 
     @Modifying
-    @Query(value = "update TB_INIT_DATA set JWT_TOKEN =:jwtToken where UNIQUE_ID =: deviceId", nativeQuery = true)
+    @Query(value = "update TB_INIT_DATA set JWT_TOKEN =:jwtToken where UNIQUE_ID =:deviceId", nativeQuery = true)
     void updateInitJwt(@Param("deviceId") String deviceId, @Param("jwtToken") String jwtToken);
 
     @Query(value = "select * from TB_INIT_DATA where DEVICE_ID =:deviceId", nativeQuery = true)
