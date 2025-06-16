@@ -1,16 +1,23 @@
 package com.example.expensetracker.interceptor;
 
+import com.example.expensetracker.util.constants.AppConstants;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.io.IOException;
 import java.util.Base64;
+import java.util.Date;
 
 @Configuration
 @EnableWebSecurity
@@ -22,10 +29,25 @@ public class SecurityInterceptor implements HandlerInterceptor {
     @Value("${auth.basic.password}")
     private String BASIC_AUTH_PASSWORD;
 
+    public static boolean validateToken(HttpServletResponse response, String base64Token) throws IOException {
+        try {
+            Claims claim = Jwts.parserBuilder().setSigningKey(AppConstants.tokenKey).build().parseClaimsJws(base64Token).getBody();
+            if (claim.getExpiration().before(new Date())) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token.");
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token.");
+            return false;
+        }
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                .csrf(AbstractHttpConfigurer::disable) // disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll() // or restrict as needed
                 );
@@ -34,7 +56,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler)
             throws Exception {
 
         System.out.println("[AUTH] Incoming request to: " + request.getRequestURI());
@@ -45,7 +67,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
         String authHeader = request.getHeader("Authorization");
 
         // Skip authorization check for /api/genToken/** - For Basic Auth
-        if (requestURI.startsWith("/api/genToken")) {
+        if (requestURI.endsWith("/api/genToken")) {
             if (authHeader == null || !authHeader.startsWith("Basic ")) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Missing Basic Authorization header");
@@ -61,21 +83,19 @@ public class SecurityInterceptor implements HandlerInterceptor {
                 response.getWriter().write("Invalid Basic Auth credentials");
                 return false;
             }
-
             return true;
         }
 
         //Check for the Bearer Token
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (!authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Missing or invalid Authorization header");
             return false;
+        } else {
+            String base64Credentials = authHeader.split("Bearer ")[1];
+            boolean isValid = validateToken(response, base64Credentials);
+            return isValid;
         }
-
-        // You can validate JWT here if needed
-
-
-        return true; // continue processing
     }
 }
 
