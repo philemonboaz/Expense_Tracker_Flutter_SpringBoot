@@ -51,4 +51,14 @@ public class ExpenseService {
             return ResponseUtil.exceptionResp(409, "Error");
         }
     }
+
+    public ApiBaseResponse<String> deleteExpense(String deviceId, int sno) {
+        try {
+            expenseRepository.deleteExpense(deviceId, sno);
+            return ResponseUtil.successResp("ok", null);
+        } catch (Exception e) {
+            
+            return ResponseUtil.exceptionResp(509, "Error");
+        }
+    }
 }

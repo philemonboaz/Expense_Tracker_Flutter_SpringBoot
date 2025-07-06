@@ -31,4 +31,10 @@ public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
                                                           @Param("fromDate") Date fromDate,
                                                           @Param("toDate") Date toDate);
 
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from tb_expense_data where sno =:sno and DEVICE_ID =:deviceId", nativeQuery = true)
+    void deleteExpense(@Param("deviceId") String deviceId, @Param("sno") int sno);
+
 }

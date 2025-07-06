@@ -1,6 +1,7 @@
 package com.example.expensetracker.controllers;
 
 import com.example.expensetracker.dto.AddExpenseModel;
+import com.example.expensetracker.dto.request_models.DeleteExpenseRequestModel;
 import com.example.expensetracker.dto.request_models.GetAllExpenseRequestModel;
 import com.example.expensetracker.entity.ExpenseEntity;
 import com.example.expensetracker.service.ExpenseService;
@@ -32,6 +33,11 @@ public class ExpenseController {
         } else {
             return expenseService.getAllExpenseData(requestBody.getDeviceId(), requestBody.getFromDate(), requestBody.getToDate());
         }
+    }
+
+    @PostMapping("/deleteExpense")
+    public ApiBaseResponse<String> deleteExpense(@RequestBody DeleteExpenseRequestModel requestBody) {
+        return expenseService.deleteExpense(requestBody.getDeviceId(), requestBody.getSno());
     }
 
 
