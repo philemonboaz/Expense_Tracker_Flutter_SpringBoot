@@ -1,6 +1,6 @@
 package com.example.expensetracker.interceptor;
 
-import com.example.expensetracker.util.constants.AppConstants;
+import com.example.expensetracker.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 
     public static boolean validateToken(HttpServletResponse response, String base64Token) throws IOException {
         try {
-            Claims claim = Jwts.parserBuilder().setSigningKey(AppConstants.tokenKey).build().parseClaimsJws(base64Token).getBody();
+            Claims claim = Jwts.parserBuilder().setSigningKey(JwtUtil.getKey()).build().parseClaimsJws(base64Token).getBody();
             if (claim.getExpiration().before(new Date())) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token.");
                 return false;
@@ -86,16 +86,41 @@ public class SecurityInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        //Check for the Bearer Token
-        if (!authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Missing or invalid Authorization header");
-            return false;
-        } else {
-            String base64Credentials = authHeader.split("Bearer ")[1];
-            boolean isValid = validateToken(response, base64Credentials);
-            return isValid;
-        }
+        return isAuthorized(request, response);
+//        if (authHeader == null) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Missing or invalid Authorization header");
+//            return false;
+//        }
+//
+//        //Check for the Bearer Token
+//        if (!authHeader.startsWith("Bearer ")) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Missing or invalid Authorization header");
+//            return false;
+//        } else {
+//            String base64Credentials = authHeader.split("Bearer ")[1];
+//            boolean isValid = validateToken(response, base64Credentials);
+//            return isValid;
+//        }
     }
+
+    private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            unauthorized(response, "Missing or invalid Authorization header");
+            return false;
+        }
+
+        String token = authHeader.substring(7); // Removes "Bearer " prefix
+        return validateToken(response, token);
+    }
+
+    private void unauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write(message);
+    }
+
 }
 
