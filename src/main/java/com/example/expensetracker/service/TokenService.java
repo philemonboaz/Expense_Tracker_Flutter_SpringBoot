@@ -1,7 +1,8 @@
 package com.example.expensetracker.service;
 
-import com.example.expensetracker.model.InitDataEntity;
+import com.example.expensetracker.entity.InitDataEntity;
 import com.example.expensetracker.repository.InitDataRepository;
+import com.example.expensetracker.util.JwtUtil;
 import com.example.expensetracker.util.constants.AppConstants;
 import com.example.expensetracker.util.enums.ErrorCodes;
 import com.example.expensetracker.util.response.ApiBaseResponse;
@@ -10,13 +11,12 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Service
 public class TokenService {
-
-    private static final Key key = AppConstants.tokenKey;
+    private static final SecretKey key = JwtUtil.getKey();
     private static final long EXPIRATION_TIME = 86400000; // 1 day in ms
     @Autowired
     private InitDataRepository initRepository;

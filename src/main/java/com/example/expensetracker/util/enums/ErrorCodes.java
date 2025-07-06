@@ -10,7 +10,8 @@ public enum ErrorCodes {
     BAD_REQUEST(400, "Bad Request"),
     FORBIDDEN(401, "Access denied - forbidden"),
     SERVICE_UNAVAILABLE(503, "Service Unavailable"),
-    COMMON(404, "An unexpected error occurred");
+    COMMON(404, "An unexpected error occurred"),
+    CODE_ERROR(409, "An unexpected error occurred");
 
 
     private static final Map<Integer, ErrorCodes> CODE_MAP = new HashMap<>();

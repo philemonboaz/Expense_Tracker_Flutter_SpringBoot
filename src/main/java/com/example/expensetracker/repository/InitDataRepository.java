@@ -1,6 +1,6 @@
 package com.example.expensetracker.repository;
 
-import com.example.expensetracker.model.InitDataEntity;
+import com.example.expensetracker.entity.InitDataEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

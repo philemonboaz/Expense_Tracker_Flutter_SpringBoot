@@ -9,7 +9,7 @@ public class ErrorResponse {
     public ErrorResponse() {
     }
 
-    public ErrorResponse(int errorCode, String errorMsg) {
+    public ErrorResponse(int errorCode) {
         this.errorCode = errorCode;
         this.errorMsg = getErrorMsg(errorCode);
     }
@@ -19,7 +19,7 @@ public class ErrorResponse {
             case 400 -> getMessageByCode(400);
             case 401 -> getMessageByCode(401);
             case 404 -> getMessageByCode(404);
-            case 500 -> getMessageByCode(500);
+            case 409 -> getMessageByCode(409);
             default -> getMessageByCode(500);
         };
     }
