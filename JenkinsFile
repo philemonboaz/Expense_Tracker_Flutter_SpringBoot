@@ -3,12 +3,18 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                git branch : 'DEV', credentialsId : 'github-creds', url: 'https://github.com/philemonboaz/Expense_Tracker_Flutter_SpringBoot.git'
+                git branch : 'DEV_DEPLOYMENT', credentialsId : 'github-creds', url: 'https://github.com/philemonboaz/Expense_Tracker_Flutter_SpringBoot.git'
             }
         }
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                script{
+                    if (isUnix()) {
+                        sh 'mvn clean install -DskipTests'
+                    } else {
+                        bat 'mvn clean install -DskipTests'
+                    }
+                }
             }
         }
         stage('Docker Build') {
