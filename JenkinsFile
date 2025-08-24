@@ -11,6 +11,26 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
+        stage('Docker Build') {
+            steps {
+                script{
+                    docker.build("expense-tracker-backend:latest")
+                }
+            }
+        }
+        stage('Run Container') {
+            steps {
+                script{
+                    if (isUnix()) {
+                        sh 'docker rm -f expense-backend || true'
+                        sh 'docker run -d --name expense-backend -p 9091:9091 expense-tracker-backend:latest'
+                    } else {
+                        bat 'docker rm -f expense-backend || true'
+                        bat 'docker run -d --name expense-backend -p 9091:9091 expense-tracker-backend:latest'
+                    }
+                }
+            }
+        }
         stage('Archive') {
             steps {
                 archiveArtifacts artifacts : 'target/*.jar', fingerprint: true
