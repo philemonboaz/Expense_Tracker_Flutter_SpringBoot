@@ -19,8 +19,6 @@ public class PreloadDataController {
     @GetMapping
     public ApiBaseResponse<List<Map<String, Object>>> getExpense() {
         try {
-
-
             List<Map<String, Object>> expenseList = new ArrayList<>();
 
             // Creating multiple sample expenses

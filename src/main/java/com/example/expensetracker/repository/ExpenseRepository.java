@@ -37,4 +37,42 @@ public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
     @Query(value = "delete from tb_expense_data where sno =:sno and DEVICE_ID =:deviceId", nativeQuery = true)
     void deleteExpense(@Param("deviceId") String deviceId, @Param("sno") int sno);
 
+//    @Query(value = "SELECT * FROM tb_expense_data WHERE DEVICE_ID =:deviceId OFFSET :offSetData ROWS FETCH NEXT :noOfRecords ROWS ONLY", nativeQuery = true)
+//    List<ExpenseEntity> getAllExpenseDataByPagination(@Param("deviceId") String deviceId, @Param("offSetData") int offSetData, @Param("noOfRecords") int noOfRecords);
+
+    //    @Query(value = """
+//            SELECT * FROM (
+//                SELECT a.*, ROWNUM rnum FROM (
+//                    SELECT * FROM tb_expense_data
+//                    WHERE DEVICE_ID = :deviceId
+//                    ORDER BY CREATED_AT DESC
+//                ) a WHERE ROWNUM <= :endRow
+//            ) WHERE rnum > :startRow
+//            """, nativeQuery = true)
+//    List<ExpenseEntity> getAllExpenseDataByPagination(
+//            @Param("deviceId") String deviceId,
+//            @Param("startRow") int startRow,
+//            @Param("endRow") int endRow);
+    @Query(value = """
+                 SELECT * FROM (
+                     SELECT a.*, ROWNUM rnum FROM (
+                         SELECT * FROM tb_expense_data\s
+                         WHERE DEVICE_ID = :deviceId\s
+                         ORDER BY CREATED_AT DESC
+                     ) a\s
+                     WHERE ROWNUM <= (:offset + :pageSize)
+                 )\s
+                 WHERE rnum > :offset
+            \s""", nativeQuery = true)
+    List<ExpenseEntity> getAllExpenseDataByPagination(
+            @Param("deviceId") String deviceId,
+            @Param("offset") int offset,
+            @Param("pageSize") int pageSize
+    );
+
+//    @Query(value = "select * from tb_expense_data where DEVICE_ID =:deviceId and (CREATED_AT >= :month and CREATED_AT < :month )", nativeQuery = true)
+//    List<ExpenseEntity> getAllExpenseDataByMonth(@Param("deviceId") String deviceId, @Param("month") String month);
+
+    @Query(value = "select * from tb_expense_data where DEVICE_ID =:deviceId and (CREATED_AT >= :startOfMonth and CREATED_AT < :endOfMonth )", nativeQuery = true)
+    List<ExpenseEntity> getAllExpenseDataByMonth(@Param("deviceId") String deviceId, @Param("startOfMonth") Date startOfMonth, @Param("endOfMonth") Date endOfMonth);
 }
